@@ -44,6 +44,7 @@ class NYT_recipe:
 # and returns a recipe object
 
 def get_recipe(url):
+    # Assumes the URL is a valid NYT recipe URL
     recipe = NYT_recipe(url)
     # open the URL
     response = requests.get(url)
