@@ -7,12 +7,12 @@ class Ingredient(models.Model):
                                     verbose_name = 'Primary Name',
                                     )
     # csv of alternate names for ingredient e.g. 00 flour,strong flour
-    alternate_names = models.CharField(
-                                        max_length = 200,
-                                        verbose_name = 'Alternate Names',
-                                        blank = True,
-                                        null = True
-                                        )
+    # alternate_names = models.CharField(
+    #                                     max_length = 200,
+    #                                     verbose_name = 'Alternate Names',
+    #                                     blank = True,
+    #                                     null = True
+    #                                     )
 
     def __str__(self):
         return self.primary_name
@@ -26,14 +26,18 @@ class Recipe(models.Model):
     title = models.CharField(max_length = 40)
     #recipe source (e.g. NYT, Bon Appetit)
     source = models.CharField(max_length = 100)
+    #recipe source url, note this is not required since some recipes will not have a source url
+    source_url = models.CharField(max_length = 100, blank = True, null = True)
     #contributor (user who uploaded) eventually this will link to user model, now just ask for name when submitting
     contributor = models.CharField(max_length = 100)
-    #number of people recipe serves
-    serves = models.PositiveSmallIntegerField()
+    #recipe yeild
+    serves = models.PositiveIntegerField(blank = True, null = True)
+    #What is the recipe output. This may be how many brownies a recipe makes
+    yeild = models.CharField(max_length=50)
     #time to prepare recipe in minutes
-    prep_time = models.PositiveIntegerField()
+    prep_time = models.PositiveIntegerField(blank = True, null = True)
     #time to cook recipe in minutes
-    cook_time = models.PositiveIntegerField()
+    cook_time = models.PositiveIntegerField(blank = True, null = True)
     #list of ingredients (many to many field)
     ingredients = models.ManyToManyField(Ingredient)
     #csv with ingredient primary name and quantity deliminated as follows: flour,100g;water,50g;salt,1tsp
