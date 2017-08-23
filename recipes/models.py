@@ -24,6 +24,10 @@ class Ingredient(models.Model):
 class Recipe(models.Model):
     #recipe title
     title = models.CharField(max_length = 40)
+    #recipe source (e.g. NYT, Bon Appetit)
+    source = models.CharField(max_length = 100)
+    #contributor (user who uploaded) eventually this will link to user model, now just ask for name when submitting
+    contributor = models.CharField(max_length = 100)
     #number of people recipe serves
     serves = models.PositiveSmallIntegerField()
     #time to prepare recipe in minutes
@@ -34,14 +38,14 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(Ingredient)
     #csv with ingredient primary name and quantity deliminated as follows: flour,100g;water,50g;salt,1tsp
     ingredient_list = models.CharField(max_length = 500)
-    #instruction list
+    #instruction list - determine format later
     instructions = models.TextField()
-    #meal type (choices: breakfast, lunch, dinner, desert, snack)
+    #meal type (choices: breakfast, lunch, dinner, dessert, snack)
     MEAL_TYPE_CHOICES = (
         ('BRE', 'BREAKFAST'),
         ('LUN', 'LUNCH'),
         ('DIN', 'DINNER'),
-        ('DES', 'DESERT'),
+        ('DES', 'DESSERT'),
         ('SNA', 'SNACK')
     )
     meal_type = models.CharField(max_length = 3, choices = MEAL_TYPE_CHOICES, default = 'DIN')
