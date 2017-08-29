@@ -23,6 +23,9 @@ class NYT_recipe:
         self.cook_time = cook_time
     def add_yield(self, recipe_yield):
         self.recipe_yield = recipe_yield
+    def add_rating(self, nrating, nstars):
+        self.num_ratings = nrating
+        self.num_stars = nstars
     def print_recipe(self):
         print(self.url)
         print(self.title)
@@ -36,6 +39,13 @@ class NYT_recipe:
         for i, step in enumerate(self.steps):
             print('Step %i:'%(i+1))
             print(step)
+    def get_recipe_string(self):
+        str_tot = self.title + ' ' + self.description
+        for tag in self.tags:
+            str_tot = str_tot + ' ' + tag
+        for ing in self.ingredient_names:
+            str_tot = str_tot + ' ' + ing
+        return str_tot
 
 
 
@@ -49,19 +59,19 @@ def get_recipe(url):
     # open the URL
     response = requests.get(url)
     html = response.content
-    soup = BeautifulSoup(html)
-
+    soup = BeautifulSoup(html, "html.parser")
+    if (soup == None):
+        print('couldnt find recipe at:', url)
+        return -1
     # First get the ingredient list (quantities and ingredients)
     ingredients = soup.find('ul', attrs={'class': 'recipe-ingredients'})
     quantities = []
     ingredient_names = []
     for row in ingredients.findAll('li'):
         #print row.getText(separator=' ')
-        ingredient_names.append(row.find('span', attrs ={'class':'ingredient-name'}).getText(separator=' '))
-        quantity = row.find('span', attrs={'class': 'quantity'}).getText(separator=' ')
-        if quantity.startswith('&frac'):
-            quantity = quantity.replace('&frac', '').replace(';', '')
-            quantity = str(float(quantity[0]) / float(quantity[1:]))
+        ingredient_names.append(row.find('span', attrs ={'class':'ingredient-name'}).getText(separator=' ').strip())
+        quantity = row.find('span', attrs={'class': 'quantity'}).getText(separator=' ').strip()
+        quantity = quantity.replace('½', '0.5').replace('¼', '0.25')
         quantities.append(quantity)
     recipe.add_ingredients(ingredient_names, quantities)
     # Next get the recipe steps
@@ -82,7 +92,7 @@ def get_recipe(url):
     if (title == None):
         title = 'None'
     else:
-        title = title.getText()
+        title = title.getText().strip()
     recipe.add_title(title)
     # Get the cook time, if there is one
     time_check = soup.find('span', attrs={'class': 'recipe-yield-time-label recipe-time'})
@@ -100,16 +110,31 @@ def get_recipe(url):
         recipe_yield = recipe_yield.getText()
     recipe.add_yield(recipe_yield)
     # Get the description of the recipe
-    topnote = soup.find('div', attrs={'class': 'topnote'}).find('p')
+    topnote = soup.find('div', attrs={'class': 'topnote'})
     if (topnote == None):
-        topnote='None'
+        topnote=''
     else:
-        topnote = topnote.getText()
+        topnote = topnote.find('p').getText().strip()
     recipe.add_description(topnote)
     # Get any recipe tags
     nutrition = soup.find('div', attrs={'class': 'tags-nutrition-container'})
     recipe_tags = []
-    for tags in nutrition.findAll('a'):
-        recipe_tags.append(tags.getText())
+    if (nutrition != None):
+        for tags in nutrition.findAll('a'):
+            recipe_tags.append(tags.getText())
     recipe.add_tags(recipe_tags)
+
+    rv = soup.find('span', attrs={'itemprop': 'ratingValue'})
+    if (rv == None):
+        rating_value = 0
+    else:
+        rating_value = int(rv.getText())
+    rc = soup.find('span', attrs={'itemprop': 'ratingCount'})
+    if (rc == None):
+        rating_count = 0
+    else:
+        rating_count = int(rc.getText())
+    recipe.add_rating(rating_count, rating_value)
+
+
     return recipe
