@@ -7,7 +7,7 @@ class RecipeForm(forms.ModelForm):
         fields = (
                     'title', 'source', 'contributor',
                     'serves', 'prep_time', 'cook_time',
-                    'ingredients', 'ingredient_list', 'instructions',
+                    'ingredient_list', 'ingredient_list', 'instructions',
                     'meal_type', 'dish_type'
                     )
 

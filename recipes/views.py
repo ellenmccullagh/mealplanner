@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from .forms import RecipeForm, UrlRecipeForm
 from . import scrape_nyt as scrape
-from .models import Recipe
+from .models import Recipe, RecipeIngredient
 
 # Create your views here.
 
@@ -20,6 +20,14 @@ def recipe_from_url(request):
             contributor = form.cleaned_data['contributor']
             # scrape and get info
             recipe_info  = scrape.get_recipe(url)
+            ingredient_list_og = recipe_info.ingredient_names
+            ingredient_list = []
+            for ingredient in ingredient_list_og:
+                ingredient_list.append(
+                    RecipeIngredient.objects.create(
+                            
+                    )
+                )
             # reform ingredients into string
             ingredient_list = ''
             for i in range(len(recipe_info.ingredient_names)):

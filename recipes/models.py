@@ -59,10 +59,10 @@ class Unit(models.Model):
 
 class RecipeIngredient(models.Model):
     recipe_text = models.CharField(max_length = 50)
-    matched_ingredient = models.ForeignKey(Ingredient)
-    unit = models.ForeignKey(Unit)
+    matched_ingredient = models.ForeignKey(Ingredient, blank = True, null = True)
+    unit = models.ForeignKey(Unit, blank = True, null = True)
     ammount = models.DecimalField(max_digits = 4, decimal_places = 3)
-    associated_recipe_slug = models.CharField(max_length = 40)
+    associated_recipe_title = models.CharField(max_length = 40)
 
     def __str__(self):
         return self.recipe_text
@@ -87,7 +87,7 @@ class Recipe(models.Model):
     #time to cook recipe in minutes
     cook_time = models.PositiveIntegerField(blank = True, null = True)
     #list of ingredients (many to many field)
-    ingredient_list = models.ManyToMany(RecipeIngredient)
+    ingredient_list = models.ManyToManyField(RecipeIngredient)
     #instruction list - determine format later
     instructions = models.TextField()
     #meal type (choices: breakfast, lunch, dinner, dessert, snack)
@@ -110,5 +110,5 @@ class Recipe(models.Model):
     dish_type = models.CharField(max_length = 3, choices = DISH_TYPE_CHOICES, default = 'VEG')
     #flavor profile helps create meals that go together
 
-        def __str__(self):
-            return self.title
+    def __str__(self):
+        return self.title
