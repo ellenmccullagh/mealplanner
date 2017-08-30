@@ -1,0 +1,30 @@
+{% extends 'recipes/index.html' %}
+
+{% block content %}
+  {% if recipe %}
+    {% for r in recipe %}
+      <div class="well">
+        <h3>{{ r.title|safe|linebreaks }}</h3>
+        <strong>Source:</strong>
+        {% if r.source_url %}
+          <a href = "/{{ r.source_url }}/">{{ r.source }}</a>
+        {% elif r.source_url == None %}
+          <p>{{ r.source|safe|linebreaks }}</p>
+        {% endif %}
+
+
+        <h4>Ingredients:</h4>
+        {% for ing in r.ingredient_list.all %}
+          <p>{{ ing.recipe_text }}</p>
+          <p>Matched Ingredient: {{ ing.matched_ingredient }}</p>
+          <p>Quantity: {{ ing.ammount }} {% if ing.ammount == 1 %} {{ ing.unit.unit_name }} {% elif ing.ammount > 1 %} {{ ing.unit.unit_name_plural }} {% endif %}</p>
+          <br>
+        {% endfor %}
+        <h4>Procedure:</h4>
+        <p>{{ r.instructions }}</p>
+      </div>
+    {% endfor %}
+  {% else %}
+  <p>No recipes matched</p>
+  {% endif %}
+{% endblock %}

@@ -12,6 +12,13 @@ def recipe_new(request):
     form = RecipeForm()
     return render(request, 'recipes/recipe_edit.html', {'form': form})
 
+def getRecipe(request, recipeSlug):
+    # Get specified protocol
+    recipe = Recipe.objects.filter(slug=recipeSlug)
+    # ingredients = recipe.ingredient_list.all()
+    # Display specified protocol
+    return render(request, 'recipes/recipe.html', {'recipe':recipe})
+
 def recipe_from_url(request):
     if request.method == 'POST':
         form = UrlRecipeForm(request.POST)
@@ -25,7 +32,7 @@ def recipe_from_url(request):
             for ingredient in ingredient_list_og:
                 ingredient_list.append(
                     RecipeIngredient.objects.create(
-                            
+
                     )
                 )
             # reform ingredients into string

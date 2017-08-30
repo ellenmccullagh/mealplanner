@@ -1,5 +1,13 @@
 from django.db import models
 
+class IngredientCategory(models.Model):
+    name = models.CharField(max_length = 50, verbose_name = 'Ingredient Category', unique = True)
+    class Meta:
+        verbose_name_plural = 'Ingredient Categories'
+
+    def __str__(self):
+        return self.name
+
 class Ingredient(models.Model):
     # primary ingredient name e.g. bread flour
     primary_name = models.CharField(
@@ -7,6 +15,8 @@ class Ingredient(models.Model):
                                     verbose_name = 'Primary Name',
                                     unique = True
                                     )
+    alternate_names = models.CharField(max_length = 500, verbose_name = 'Alternate Names', blank = True, null = True)
+    category = models.ManyToManyField(IngredientCategory)
 
     def __str__(self):
         return self.primary_name
@@ -58,11 +68,12 @@ class Unit(models.Model):
         return self.unit_name
 
 class RecipeIngredient(models.Model):
-    recipe_text = models.CharField(max_length = 50)
-    matched_ingredient = models.ForeignKey(Ingredient, blank = True, null = True)
+    recipe_text = models.CharField(max_length = 100)
+    index = models.IntegerField(verbose_name = 'Ingredient Index')
+    matched_ingredient = models.ForeignKey(Ingredient)
     unit = models.ForeignKey(Unit, blank = True, null = True)
     ammount = models.DecimalField(max_digits = 4, decimal_places = 3)
-    associated_recipe_title = models.CharField(max_length = 40)
+    associated_recipe_slug = models.CharField(max_length = 40)
 
     def __str__(self):
         return self.recipe_text
