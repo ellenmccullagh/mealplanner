@@ -20,6 +20,23 @@ def getRecipe(request, recipeSlug):
     # Display specified protocol
     return render(request, 'recipes/recipe.html', {'recipe':recipe})
 
+def extract_ingredient_info(ing, unit_set, ingredient_set):
+    unit_match = None
+    ingredient_match = None
+    # Iterate through units and see if any of them are in our string
+    for u in unit_set:
+        if u.unit_name in ing.lower():
+            unit_match = u
+            break
+    # Iterate through ingredients and see if any of them are in our string
+    for i in ingredient_set:
+        if i.primary_name in ing.lower():
+            # currently just finds the first ingredient match, then quits
+            ingredient_match = i
+            break
+    return unit_match, ingredient_match
+
+
 def recipe_from_url(request):
     #get the url from the form.
     #scrape the data from the url
@@ -56,10 +73,12 @@ def recipe_from_url(request):
                             instructions = ';;'.join(recipe_info.steps)
                                                     )
             #create ingredient instances
-            for ing in recipe_info.ingredients:
+            for ing, quant in zip(recipe_info.ingredient_names, recipe_info.ingredient_quantities):
                 #match ingredient
+                #ing_match and unit_match will be objects from units / ingredients sets
+                #or else None if no match is found
+                ing_match, unit_match = extract_ingredient_info(ing, unit_set, ingredient_set)
                 #find quantity
-                #match unit
                 #create instance (include index)
                 #add ing instance to recipe_instance
                 break
