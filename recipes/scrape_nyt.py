@@ -67,6 +67,7 @@ def get_quantity_float(quantity):
     for num in quantity.split(' '):
         if num.isnumeric():
             return float(num)
+    return 0.0
 
 
 
