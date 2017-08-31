@@ -51,7 +51,7 @@ class NYT_recipe:
 
 
 def get_quantity_float(quantity):
-    quantity = quantity.replace('½', '0.5').replace('¼', '0.25').replace('⅛', '0.125')
+    quantity = quantity.replace('½', '0.5').replace('¼', '0.25').replace('⅛', '0.125').replace('⅓', '0.333')
     try:
         return float(quantity)
     except Exception:
