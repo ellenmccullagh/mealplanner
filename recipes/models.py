@@ -82,7 +82,7 @@ class Recipe(models.Model):
     #recipe title and  derived url slug
     title = models.CharField(max_length = 40, unique = True)
     slug = models.SlugField(max_length = 40, unique = True)
-    prepopulated_fields = {'slug': {'title', }}
+    prepopulated_fields = {'slug': ('title', ),}
     #recipe source (e.g. NYT, Bon Appetit)
     source = models.CharField(max_length = 100)
     #recipe source url, note this is not required since some recipes will not have a source url

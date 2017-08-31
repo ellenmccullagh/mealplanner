@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .forms import RecipeForm, UrlRecipeForm
 from . import scrape_nyt as scrape
 from .models import Recipe, RecipeIngredient
+from django.template.defaultfilters import slugify
 
 # Create your views here.
 
@@ -20,31 +21,31 @@ def getRecipe(request, recipeSlug):
     return render(request, 'recipes/recipe.html', {'recipe':recipe})
 
 def recipe_from_url(request):
+    #get the url from the form.
+    #scrape the data from the url
+    #create a recipe object and add all information except the ingredients
+    #match the ingredients to known ingredients
+    #create ingredient objects and add to recipe object as they are created
     if request.method == 'POST':
         form = UrlRecipeForm(request.POST)
         if form.is_valid():
             url = form.cleaned_data['url']
             contributor = form.cleaned_data['contributor']
+
             # scrape and get info
             recipe_info  = scrape.get_recipe(url)
-            ingredient_list_og = recipe_info.ingredient_names
-            ingredient_list = []
-            for ingredient in ingredient_list_og:
-                ingredient_list.append(
-                    RecipeIngredient.objects.create(
 
-                    )
-                )
-            # reform ingredients into string
-            ingredient_list = ''
-            for i in range(len(recipe_info.ingredient_names)):
-                entry = recipe_info.ingredient_names[i] + ';;' + recipe_info.ingredient_quantities[i]
-                if i != len(recipe_info.ingredient_names):
-                    entry += ';:;'
-                ingredient_list += entry
-            # store into django models
+            #create slug and ensure uniqueness
+            recipe_slug = orig = slugify(recipe_info.title)
+            for x in itertools.count(1):
+                if not Recipe.objects.filter(slug=recipe_slug).exists():
+                    break
+                recipe_slug = '{}s-{}d'.format(orig, x)
+
+            # create recipe instance
             recipe_instance = Recipe.objects.create(
                             title = recipe_info.title,
+                            slug = recipe_slug,
                             source = recipe_info.source,
                             source_url = url,
                             contributor = contributor,
@@ -52,10 +53,16 @@ def recipe_from_url(request):
                             #prep_time = ,
                             #cook_time = recipe_info.cook_time,
                             #ingredients = ,
-                            ingredient_list = ingredient_list,
                             instructions = ';;'.join(recipe_info.steps)
                                                     )
-
+            #create ingredient instances
+            for ing in recipe_info.ingredients:
+                #match ingredient
+                #find quantity
+                #match unit
+                #create instance (include index)
+                #add ing instance to recipe_instance
+                break
             return render(request, 'recipes/success.html')
     else:
         form = UrlRecipeForm()
