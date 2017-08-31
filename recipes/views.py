@@ -73,13 +73,25 @@ def recipe_from_url(request):
                             instructions = ';;'.join(recipe_info.steps)
                                                     )
             #create ingredient instances
+            index = 0
             for ing, quant in zip(recipe_info.ingredient_names, recipe_info.ingredient_quantities):
                 #match ingredient
                 #ing_match and unit_match will be objects from units / ingredients sets
                 #or else None if no match is found
+                unit_set = Unit.objects.all()
+                ingredient_set = Ingredient.objects.all()
                 ing_match, unit_match = extract_ingredient_info(ing, unit_set, ingredient_set)
                 #find quantity
                 #create instance (include index)
+                recipe_ingredient_row = RecipeIngredient(
+                        recipe_text = ing,
+                        index = index,
+                        matched_ingredient = ing_match,
+                        unit = unit_match,
+                        ammount = quant, #not working now because quant is a string and ammount is a decimal
+                        associated_recipe_slug = recipe_slug
+                    )
+                index += 1
                 #add ing instance to recipe_instance
                 break
             return render(request, 'recipes/success.html')
