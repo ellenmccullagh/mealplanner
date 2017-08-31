@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import re
 
 
 class NYT_recipe:
@@ -49,6 +50,28 @@ class NYT_recipe:
 
 
 
+def get_quantity_float(quantity):
+    quantity = quantity.replace('½', '0.5').replace('¼', '0.25').replace('⅛', '0.125')
+    try:
+        return float(quantity)
+    except Exception:
+        pass
+    if (re.match('[0-9]+ 0.[0-9]+', quantity) != None):
+        print('here')
+        quantity = re.sub('([0-9]+) 0.([0-9]+)', '\g<1>.\g<2>', quantity)
+        print(quantity)
+        try:
+            return float(quantity)
+        except Exception:
+            pass
+    for num in quantity.split(' '):
+        if num.isnumeric():
+            return float(num)
+
+
+
+
+
 
 # Scrapes the recipe at the given url
 # and returns a recipe object
@@ -64,15 +87,20 @@ def get_recipe(url):
         print('couldnt find recipe at:', url)
         return -1
     # First get the ingredient list (quantities and ingredients)
-    ingredients = soup.find('ul', attrs={'class': 'recipe-ingredients'})
+    ingredients = soup.findAll('ul', attrs={'class': 'recipe-ingredients'})
     quantities = []
     ingredient_names = []
-    for row in ingredients.findAll('li'):
-        #print row.getText(separator=' ')
-        ingredient_names.append(row.find('span', attrs ={'class':'ingredient-name'}).getText(separator=' ').strip())
-        quantity = row.find('span', attrs={'class': 'quantity'}).getText(separator=' ').strip()
-        quantity = quantity.replace('½', '0.5').replace('¼', '0.25')
-        quantities.append(quantity)
+    for ingred in ingredients:
+        for row in ingred.findAll('li'):
+            #print row.getText(separator=' ')
+
+            tmp = row.find('span', attrs ={'class':'ingredient-name'})
+            if (tmp != None):
+                ingredient_names.append(tmp.getText(separator=' ').strip().replace('  ', ' '))
+            tmp = row.find('span', attrs={'class': 'quantity'})
+            if (tmp != None):
+                quantity = tmp.getText(separator=' ').strip()
+                quantities.append(get_quantity_float(quantity))
     recipe.add_ingredients(ingredient_names, quantities)
     # Next get the recipe steps
     steps = soup.find('ol', attrs={'class': 'recipe-steps'})
