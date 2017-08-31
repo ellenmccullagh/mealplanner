@@ -80,8 +80,6 @@ def recipe_from_url(request):
                 #match ingredient
                 #ing_match and unit_match will be objects from units / ingredients sets
                 #or else None if no match is found
-                unit_set = Unit.objects.all()
-                ingredient_set = Ingredient.objects.all()
                 unit_match, ing_match = extract_ingredient_info(ing, unit_set, ingredient_set)
                 #find quantity
                 quantity = None
