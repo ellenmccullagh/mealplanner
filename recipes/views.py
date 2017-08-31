@@ -80,26 +80,23 @@ def recipe_from_url(request):
                 #match ingredient
                 #ing_match and unit_match will be objects from units / ingredients sets
                 #or else None if no match is found
-<<<<<<< HEAD
                 unit_set = Unit.objects.all()
                 ingredient_set = Ingredient.objects.all()
                 unit_match, ing_match = extract_ingredient_info(ing, unit_set, ingredient_set)
-=======
-                ing_match, unit_match = extract_ingredient_info(ing, unit_set, ingredient_set)
->>>>>>> baf325c4ee265573588a11ee8cf66684c2e1c0b9
                 #find quantity
                 quantity = None
                 try:
                     quantity = int(quant)
-                except ValueError:
+                except:
                     quantity = -1
                 #create instance (include index)
-                recipe_ingredient_row = RecipeIngredient(
+                if not quant:
+                    quant = ''
+                recipe_ingredient_row = RecipeIngredient.objects.create(
                         recipe_text = ing,
                         index = index,
                         matched_ingredient = ing_match,
                         unit = unit_match,
-<<<<<<< HEAD
                         ammount_text = quant,
                         ammount = quantity, #not working now because quant is a string and ammount is a decimal
                         associated_recipe_slug = recipe_slug
@@ -107,13 +104,6 @@ def recipe_from_url(request):
                 index += 1
                 #add ingredient to recipe
                 recipe_instance.ingredient_list.add(recipe_ingredient_row)  #adds the ingredient object to the recipe. this relationship is many to one
-=======
-                        amount = quant, #not working now because quant is a string and ammount is a decimal
-                        associated_recipe_slug = recipe_slug
-                    )
-                #add ing instance to recipe_instance
-                break
->>>>>>> baf325c4ee265573588a11ee8cf66684c2e1c0b9
             return render(request, 'recipes/success.html')
     else:
         form = UrlRecipeForm()
