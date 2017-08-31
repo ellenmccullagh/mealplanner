@@ -1,8 +1,9 @@
 from django.shortcuts import render
 from .forms import RecipeForm, UrlRecipeForm
 from . import scrape_nyt as scrape
-from .models import Recipe, RecipeIngredient
+from .models import Recipe, RecipeIngredient, Unit, Ingredient
 from django.template.defaultfilters import slugify
+import itertools
 
 # Create your views here.
 
@@ -21,8 +22,8 @@ def getRecipe(request, recipeSlug):
     return render(request, 'recipes/recipe.html', {'recipe':recipe})
 
 def extract_ingredient_info(ing, unit_set, ingredient_set):
-    unit_match = None
-    ingredient_match = None
+    unit_match = unit_set.get(unit_name='count')
+    ingredient_match = ingredient_set.get(primary_name='unmatched')
     # Iterate through units and see if any of them are in our string
     for u in unit_set:
         if u.unit_name in ing.lower():
@@ -80,20 +81,26 @@ def recipe_from_url(request):
                 #or else None if no match is found
                 unit_set = Unit.objects.all()
                 ingredient_set = Ingredient.objects.all()
-                ing_match, unit_match = extract_ingredient_info(ing, unit_set, ingredient_set)
+                unit_match, ing_match = extract_ingredient_info(ing, unit_set, ingredient_set)
                 #find quantity
+                quantity = None
+                try:
+                    quantity = int(quant)
+                except ValueError:
+                    quantity = -1
                 #create instance (include index)
                 recipe_ingredient_row = RecipeIngredient(
                         recipe_text = ing,
                         index = index,
                         matched_ingredient = ing_match,
                         unit = unit_match,
-                        ammount = quant, #not working now because quant is a string and ammount is a decimal
+                        ammount_text = quant,
+                        ammount = quantity, #not working now because quant is a string and ammount is a decimal
                         associated_recipe_slug = recipe_slug
                     )
                 index += 1
-                #add ing instance to recipe_instance
-                break
+                #add ingredient to recipe
+                recipe_instance.ingredient_list.add(recipe_ingredient_row)  #adds the ingredient object to the recipe. this relationship is many to one
             return render(request, 'recipes/success.html')
     else:
         form = UrlRecipeForm()
