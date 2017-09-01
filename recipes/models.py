@@ -73,7 +73,7 @@ class RecipeIngredient(models.Model):
     matched_ingredient = models.ForeignKey(Ingredient)
     unit = models.ForeignKey(Unit, blank = True, null = True)
     ammount = models.DecimalField(max_digits = 4, decimal_places = 3)
-    ammount_text = models.CharField(max_length = 150)
+    # ammount_text = models.CharField(max_length = 150)
     associated_recipe_slug = models.CharField(max_length = 40)
 
     def __str__(self):
