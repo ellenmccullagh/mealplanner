@@ -4,6 +4,7 @@ from . import scrape_nyt as scrape
 from .models import Recipe, RecipeIngredient, Unit, Ingredient
 from django.template.defaultfilters import slugify
 import itertools
+from nltk.stem.porter import PorterStemmer
 
 # Create your views here.
 
@@ -21,6 +22,35 @@ def getRecipe(request, recipeSlug):
     # Display specified protocol
     return render(request, 'recipes/recipe.html', {'recipe':recipe})
 
+def jaccard_similarity(list1, list2):
+    nunique = len(set(list1+list2))
+    n1 = len(list1)
+    n2 = len(list2)
+    noverlap = n1+n2-nunique
+    return float(noverlap) / (n1+n2-noverlap)
+
+def match_ingredients(ing_raw, ingredient_set):
+    ingredient_match = ingredient_set.get(primary_name='unmatched')
+    max_score = 0.0
+    stemmer = PorterStemmer()
+    for ingredient in ingredient_set:
+        ing_raw_list = ing_raw.lower().split(' ')
+        ing_raw_stem = [stemmer(word) for word in ing_raw_list]
+        ing_std_list = ingredient.primary_name.split(' ')
+        ing_std_stem = [stemmer(word) for word in ing_std_list]
+        all_scores = []
+        all_scores.append(jaccard_similarity(ing_raw_stem, ing_std_stem))
+        score_alternate = []
+        for alt in ingredient.alternate_names.split(','):
+            alt_std_list = alt.strip().split(' ')
+            alt_std_stem = [stemmer(word) for word in alt_std_list]
+            all_scores.append(jaccard_similarity(ing_raw_stem, alt_std_stem)
+        if (max(all_scores) > max_score):
+            ingredient_match = ingredient
+    return ingredient_match
+
+
+
 def extract_ingredient_info(ing, unit_set, ingredient_set):
     unit_match = unit_set.get(unit_name='count')
     ingredient_match = ingredient_set.get(primary_name='unmatched')
@@ -30,11 +60,7 @@ def extract_ingredient_info(ing, unit_set, ingredient_set):
             unit_match = u
             break
     # Iterate through ingredients and see if any of them are in our string
-    for i in ingredient_set:
-        if i.primary_name in ing.lower():
-            # currently just finds the first ingredient match, then quits
-            ingredient_match = i
-            break
+    ingredient_match = match_ingredients(ing, ingredient_set)
     return unit_match, ingredient_match
 
 
