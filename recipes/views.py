@@ -5,6 +5,7 @@ from .models import Recipe, RecipeIngredient, Unit, Ingredient
 from django.template.defaultfilters import slugify
 import itertools
 from nltk.stem.porter import PorterStemmer
+import string
 
 # Create your views here.
 
@@ -30,17 +31,17 @@ def jaccard_similarity(list1, list2):
     return float(noverlap) / float(nunique)
 
 def match_ingredients(ing_raw, ingredient_set):
-    ingredient_match = ingredient_set.get(primary_name='unmatched')
     max_score = 0.0
     stemmer = PorterStemmer()
+    for c in string.punctuation:
+        raw_ingredient= ing_raw.replace(c,"")
+    ing_raw_list = raw_ingredient.lower().split(' ')
+    ing_raw_stem = [stemmer.stem(word) for word in ing_raw_list]
     for ingredient in ingredient_set:
-        ing_raw_list = ing_raw.lower().split(' ')
-        ing_raw_stem = [stemmer.stem(word) for word in ing_raw_list]
         ing_std_list = ingredient.primary_name.split(' ')
         ing_std_stem = [stemmer.stem(word) for word in ing_std_list]
         all_scores = []
         all_scores.append(jaccard_similarity(ing_raw_stem, ing_std_stem))
-        score_alternate = []
         alt_names = ingredient.alternate_names
         if not alt_names: # in case alternate_names field is empty
             alt_names = ''
@@ -50,6 +51,7 @@ def match_ingredients(ing_raw, ingredient_set):
             all_scores.append(jaccard_similarity(ing_raw_stem, alt_std_stem))
         if (max(all_scores) > max_score):
             ingredient_match = ingredient
+            max_score = max(all_scores)
     return ingredient_match
 
 
@@ -130,7 +132,6 @@ def recipe_from_url(request):
                         ammount = quant,
                         associated_recipe_slug = recipe_slug
                     )
-                index += 1
                 #add ingredient to recipe
                 recipe_instance.ingredient_list.add(recipe_ingredient_row)  #adds the ingredient object to the recipe. this relationship is many to one
             return render(request, 'recipes/success.html')
