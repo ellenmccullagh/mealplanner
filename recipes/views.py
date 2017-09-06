@@ -44,8 +44,8 @@ def match_ingredients(ing_raw, ingredient_set):
         for alt in ingredient.alternate_names.split(','):
             alt_std_list = alt.strip().split(' ')
             alt_std_stem = [stemmer(word) for word in alt_std_list]
-            all_scores.append(jaccard_similarity(ing_raw_stem, alt_std_stem)
-        if (max(all_scores) > max_score):
+            all_scores.append(jaccard_similarity(ing_raw_stem, alt_std_stem))
+        if max(all_scores) > max_score:
             ingredient_match = ingredient
     return ingredient_match
 
