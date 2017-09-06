@@ -27,7 +27,7 @@ def jaccard_similarity(list1, list2):
     n1 = len(list1)
     n2 = len(list2)
     noverlap = n1+n2-nunique
-    return float(noverlap) / (n1+n2-noverlap)
+    return float(noverlap) / float(nunique)
 
 def match_ingredients(ing_raw, ingredient_set):
     ingredient_match = ingredient_set.get(primary_name='unmatched')
@@ -35,17 +35,23 @@ def match_ingredients(ing_raw, ingredient_set):
     stemmer = PorterStemmer()
     for ingredient in ingredient_set:
         ing_raw_list = ing_raw.lower().split(' ')
-        ing_raw_stem = [stemmer(word) for word in ing_raw_list]
+        ing_raw_stem = [stemmer.stem(word) for word in ing_raw_list]
         ing_std_list = ingredient.primary_name.split(' ')
-        ing_std_stem = [stemmer(word) for word in ing_std_list]
+        ing_std_stem = [stemmer.stem(word) for word in ing_std_list]
         all_scores = []
         all_scores.append(jaccard_similarity(ing_raw_stem, ing_std_stem))
         score_alternate = []
         for alt in ingredient.alternate_names.split(','):
             alt_std_list = alt.strip().split(' ')
+<<<<<<< HEAD
             alt_std_stem = [stemmer(word) for word in alt_std_list]
             all_scores.append(jaccard_similarity(ing_raw_stem, alt_std_stem))
         if max(all_scores) > max_score:
+=======
+            alt_std_stem = [stemmer.stem(word) for word in alt_std_list]
+            all_scores.append(jaccard_similarity(ing_raw_stem, alt_std_stem)
+        if (max(all_scores) > max_score):
+>>>>>>> e0bc5a98d479775276fc77baf7448fc484fd75cb
             ingredient_match = ingredient
     return ingredient_match
 
