@@ -41,7 +41,10 @@ def match_ingredients(ing_raw, ingredient_set):
         all_scores = []
         all_scores.append(jaccard_similarity(ing_raw_stem, ing_std_stem))
         score_alternate = []
-        for alt in ingredient.alternate_names.split(','):
+        alt_names = ingredient.alternate_names
+        if not alt_names: # in case alternate_names field is empty
+            alt_names = ''
+        for alt in alt_names.split(','):
             alt_std_list = alt.strip().split(' ')
             alt_std_stem = [stemmer.stem(word) for word in alt_std_list]
             all_scores.append(jaccard_similarity(ing_raw_stem, alt_std_stem))
