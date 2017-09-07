@@ -105,10 +105,11 @@ def get_recipe(url):
                 quantities.append(get_quantity_float(quantity))
     recipe.add_ingredients(ingredient_names, quantities)
     # Next get the recipe steps
-    steps = soup.find('ol', attrs={'class': 'recipe-steps'})
+    steps = soup.findAll('ol', attrs={'class': 'recipe-steps'})
     recipe_steps = []
-    for row in steps.findAll('li'):
-        recipe_steps.append(row.getText())
+    for step in steps:
+        for row in step.findAll('li'):
+            recipe_steps.append(row.getText())
     recipe.add_steps(recipe_steps)
     # Check to see if there is a difficulty rating
     difficulty = soup.find('a', attrs={'class': 'kicker easy'})
