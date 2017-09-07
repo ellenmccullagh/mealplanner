@@ -20,7 +20,7 @@
           {% if ing.ammount == -1 %}
             <p>Quantity: {{ ing.ammount_text }} {{ ing.unit.unit_name }} </p>
           {% elif ing.ammount != -1 %}
-            <p>Quantity: {{ ing.ammount }} {% if ing.ammount == 1 %} {{ ing.unit.unit_name }} {% elif ing.ammount > 1 %} {{ ing.unit.unit_name_plural }} {% endif %}</p>
+            <p>Quantity: {{ ing.ammount|floatformat }} {% if ing.ammount == 1 %} {{ ing.unit.unit_name }} {% elif ing.ammount > 1 %} {{ ing.unit.unit_name_plural }} {% endif %}</p>
           {% endif %}
           <br>
         {% endfor %}

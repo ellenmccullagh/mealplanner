@@ -72,7 +72,7 @@ class RecipeIngredient(models.Model):
     index = models.IntegerField(verbose_name = 'Ingredient Index')
     matched_ingredient = models.ForeignKey(Ingredient)
     unit = models.ForeignKey(Unit, blank = True, null = True)
-    ammount = models.DecimalField(max_digits = 4, decimal_places = 3)
+    ammount = models.DecimalField(max_digits = 14, decimal_places = 10)
     # ammount_text = models.CharField(max_length = 150)
     associated_recipe_slug = models.CharField(max_length = 40)
 

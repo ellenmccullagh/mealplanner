@@ -94,7 +94,7 @@ def recipe_from_url(request):
             recipe_info  = scrape.get_recipe(url)
 
             #create slug and ensure uniqueness
-            recipe_slug = orig = slugify(recipe_info.title)
+            recipe_slug = orig = slugify(recipe_info.title)[:39]
             for x in itertools.count(1):
                 if not Recipe.objects.filter(slug=recipe_slug).exists():
                     break
@@ -143,7 +143,7 @@ def recipe_from_url(request):
                     )
                 #add ingredient to recipe
                 recipe_instance.ingredient_list.add(recipe_ingredient_row)  #adds the ingredient object to the recipe. this relationship is many to one
-            return render(request, 'recipes/success.html')
+            return render(request, 'recipes/{}'.format(recipe_instance.slug))
     else:
         form = UrlRecipeForm()
         return render(request, 'recipes/recipe_edit.html', {'form': form})
