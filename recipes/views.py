@@ -28,15 +28,16 @@ def jaccard_similarity(list1, list2):
     nunique = len(overlap_set)
     n1 = len(set(list1))
     n2 = len(set(list2))
-    # w1 = 1.0
-    # w2 = 1.0
-    # for item in overlap_set:
-    #     if ((item in list1) and (item in list2)):
-    #         w1 = w1*(1.0 - list1.index(item) / float(n1))
-    #         w2 = w2*(1.0 - list2.index(item) / float(n2))
+
+    w1 = 1.0
+    w2 = 1.0
+    for item in overlap_set:
+        if ((item in list1) and (item in list2)):
+            w1 = w1*(1.0 - list1.index(item) / float(len(list1)))
+            w2 = w2*(1.0 - list2.index(item) / float(len(list1)))
 
     noverlap = (n1+n2-nunique)
-    return float(noverlap) / float(nunique)
+    return w1*w2*float(noverlap) / float(nunique)
 
 def match_ingredients(ing_raw, ingredient_set):
     max_score = 0.0
